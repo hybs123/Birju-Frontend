@@ -62,14 +62,17 @@ export default function RoadmapPage() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("https://birjuram-ai.onrender.com/roadmap/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        "https://birjuram-ai.onrender.com/roadmap/generate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const data = await res.json();
       console.log("Generated roadmap:", data);
@@ -111,16 +114,18 @@ export default function RoadmapPage() {
               name="role"
               required
               placeholder="e.g., Frontend Developer"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-800 placeholder-gray-500"
             />
           </div>
 
           <div>
-            <label className="block text-gray-700 font-medium mb-2">Level</label>
+            <label className="block text-gray-700 font-medium mb-2">
+              Level
+            </label>
             <select
               name="level"
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-800"
             >
               <option value="">Select level</option>
               <option value="beginner">Beginner</option>
@@ -130,23 +135,27 @@ export default function RoadmapPage() {
           </div>
 
           <div>
-            <label className="block text-gray-700 font-medium mb-2">Skills</label>
+            <label className="block text-gray-700 font-medium mb-2">
+              Skills
+            </label>
             <input
               name="skill"
               required
               placeholder="e.g., HTML, CSS, JavaScript"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-800 placeholder-gray-500"
             />
           </div>
 
           <div>
-            <label className="block text-gray-700 font-medium mb-2">Duration (weeks)</label>
+            <label className="block text-gray-700 font-medium mb-2">
+              Duration (weeks)
+            </label>
             <input
               name="duration"
               type="number"
               required
               placeholder="e.g., 12"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-800 placeholder-gray-500"
             />
           </div>
 
@@ -178,7 +187,9 @@ export default function RoadmapPage() {
       {/* Stages */}
       {roadmap.roadmap?.stages && (
         <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-md p-6 max-w-4xl w-full mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Learning Stages</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            Learning Stages
+          </h2>
           <div className="space-y-6">
             {roadmap.roadmap.stages.map((stage, idx) => (
               <div

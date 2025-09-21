@@ -113,8 +113,8 @@ export default function Home() {
           Welcome to <span className="text-blue-600">Birjuram.Ai</span>
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mb-8">
-          Your AI-powered career companion — get personalized guidance,
-          generate roadmaps, and stay consistent with streaks.
+          Your AI-powered career companion — get personalized guidance, generate
+          roadmaps, and stay consistent with streaks.
         </p>
         <button
           onClick={() => {
@@ -145,9 +145,11 @@ export default function Home() {
             <p className="text-gray-600 mt-2 text-center">
               Get personalized advice on choosing and growing in your career.
             </p>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition mt-auto">
-              {hasCounselling ? "View Counselling" : "Get Started"}
-            </button>
+            <Link href="/counsellor" className="w-full">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition mt-auto w-full">
+                {hasCounselling ? "View Counselling" : "Get Started"}
+              </button>
+            </Link>
           </div>
 
           {/* Roadmap */}
@@ -165,27 +167,34 @@ export default function Home() {
             <p className="text-gray-600 mt-2 text-center">
               AI-generated step-by-step roadmap tailored to your goals.
             </p>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition mt-auto">
-              {hasRoadmap ? "View Roadmap" : "Get Started"}
-            </button>
+            <Link href="/roadmap" className="w-full">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition mt-auto w-full">
+                {hasRoadmap ? "View Roadmap" : "Get Started"}{" "}
+              </button>
+            </Link>
           </div>
 
-          {/* Streak */}
+          {/* Quiz Feature */}
           <div className="p-8 bg-white/70 backdrop-blur-md rounded-2xl shadow-md hover:shadow-lg transition flex flex-col items-center">
             <Image
               src="/icons/streak.png"
-              alt="Streak"
+              alt="Quiz"
               width={150}
               height={150}
               className="mb-4"
             />
-            <h3 className="text-xl font-semibold text-gray-800">Streak</h3>
+            <h3 className="text-xl font-semibold text-gray-800">Quiz</h3>
             <p className="text-gray-600 mt-2 text-center">
-              Stay motivated by tracking your daily progress and streaks.
+              Test your knowledge with weekly quizzes and track your
+              improvement.
             </p>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition mt-auto">
-              Get Started
-            </button>
+
+            {/* Link to quiz route */}
+            <Link href="/quiz" className="w-full">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition mt-auto w-full">
+                Get Started
+              </button>
+            </Link>
           </div>
         </div>
       </main>
