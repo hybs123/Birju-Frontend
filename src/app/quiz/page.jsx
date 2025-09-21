@@ -241,15 +241,7 @@ export default function QuizPage() {
                           className="p-4 border rounded-xl bg-gray-50"
                         >
                           <p className="font-medium">{q.question}</p>
-                          <p
-                            className={`mt-2 ${
-                              userAnswer === correct
-                                ? "text-green-600"
-                                : "text-red-600"
-                            }`}
-                          >
-                            Your Answer: {userAnswer || "Not answered"}
-                          </p>
+                          
                           {userAnswer !== correct && (
                             <p className="text-green-600">
                               Correct Answer: {correct}
