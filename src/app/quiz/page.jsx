@@ -4,23 +4,15 @@ import Link from "next/link";
 
 export default function QuizPage() {
   const [loading, setLoading] = useState(true);
-  const [quiz, setQuiz] = useState(null);
+  const [quizzes, setQuizzes] = useState([]);
   const [answers, setAnswers] = useState({});
   const [generating, setGenerating] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Replace with roadmap.start_date from backend
-  const roadmapStartDate = "2025-09-01"; // YYYY-MM-DD
+  // Replace with roadmap duration from backend
+  const roadmapDuration = 4; // Example: 4 weeks roadmap
 
-  // Calculate week number
-  const getWeekNumber = () => {
-    const start = new Date(roadmapStartDate);
-    const today = new Date();
-    const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
-    return Math.floor(diffDays / 7) + 1;
-  };
-
-  // Fetch existing quizzes
+  // Fetch all quizzes
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -33,30 +25,8 @@ export default function QuizPage() {
           },
         });
         const data = await res.json();
-
-        const currentWeek = getWeekNumber();
-
-        let weekQuiz = data.quiz;
-
-        if (weekQuiz) {
-          setQuiz(weekQuiz);
-        } else {
-          setGenerating(true);
-          const genRes = await fetch(
-            "https://birjuram-ai.onrender.com/quiz/generate",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ week: currentWeek }),
-            }
-          );
-          const genData = await genRes.json();
-          setQuiz(genData.quiz);
-          setGenerating(false);
-        }
+        setQuizzes(data.quizzes || []);
+        console.log("Quizzes are:", data);
       } catch (err) {
         console.error("Error fetching quizzes:", err);
       } finally {
@@ -68,16 +38,19 @@ export default function QuizPage() {
   }, []);
 
   // Handle selecting an option
-  const handleOptionChange = (questionIndex, optIndex) => {
+  const handleOptionChange = (week, questionIndex, optIndex) => {
     const optionLetter = String.fromCharCode(65 + optIndex); // A, B, C, D
     setAnswers((prev) => ({
       ...prev,
-      [questionIndex]: optionLetter,
+      [week]: {
+        ...(prev[week] || {}),
+        [questionIndex]: optionLetter,
+      },
     }));
   };
 
-  // Submit quiz to backend
-  const handleSubmit = async (e) => {
+  // Submit quiz
+  const handleSubmit = async (e, quiz) => {
     e.preventDefault();
     if (!quiz) return;
 
@@ -85,29 +58,53 @@ export default function QuizPage() {
     const token = localStorage.getItem("token");
 
     try {
-      const payload = { answers }; 
-      console.log("Answers are:",answers);// ✅ wrap answers under "answers" key
+      const payload = { answers: answers[quiz.week] || {} };
 
-      const res = await fetch(
-        "https://birjuram-ai.onrender.com/quiz/submit",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = await fetch("https://birjuram-ai.onrender.com/quiz/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ week: quiz.week, ...payload }),
+      });
 
       const data = await res.json();
       console.log("Quiz submitted successfully:", data);
+
+      setQuizzes((prev) =>
+        prev.map((q) => (q.week === quiz.week ? { ...q, ...data.quiz } : q))
+      );
       alert("Quiz submitted successfully!");
     } catch (err) {
       console.error("Error submitting quiz:", err);
       alert("Failed to submit quiz. Try again.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Generate new week quiz
+  const handleGenerateQuiz = async (week) => {
+    setGenerating(true);
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await fetch("https://birjuram-ai.onrender.com/quiz/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ week }),
+      });
+      const data = await res.json();
+      setQuizzes((prev) => [...prev, data.quiz]);
+    } catch (err) {
+      console.error("Error generating quiz:", err);
+      alert("Failed to generate quiz. Try again.");
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -129,10 +126,6 @@ export default function QuizPage() {
     );
   }
 
-  // Check if all questions are answered
-  const allAnswered =
-    quiz && Object.keys(answers).length === quiz.questions.length;
-
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
       {/* Navbar */}
@@ -143,57 +136,124 @@ export default function QuizPage() {
       </nav>
 
       {/* Quiz Section */}
-      <main className="flex flex-1 items-center justify-center px-6">
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-8 w-full max-w-3xl">
-          <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
-            Weekly Quiz – Week {quiz?.week}
-          </h2>
+      <main className="flex flex-1 flex-col items-center justify-start px-6 py-8 space-y-8">
+        {Array.from({ length: roadmapDuration }).map((_, i) => {
+          const week = i + 1;
+          const quiz = quizzes.find((q) => q.week === week);
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {quiz?.questions?.map((q, index) => (
-              <div
-                key={q.id || index}
-                className="p-4 bg-blue-50 border border-blue-200 rounded-xl shadow-sm"
-              >
-                <p className="font-medium text-gray-800">{q.question}</p>
+          return (
+            <div
+              key={week}
+              className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-8 w-full max-w-3xl"
+            >
+              <h2 className="text-2xl font-bold text-blue-600 mb-4">
+                Week {week} Quiz
+              </h2>
 
-                <div className="mt-3 space-y-2">
-                  {q.options.map((opt, optIndex) => {
-                    const optionLetter = String.fromCharCode(65 + optIndex); // A, B, C, D
-                    return (
-                      <label
-                        key={optIndex}
-                        className="flex items-center space-x-2 cursor-pointer"
+              {/* Case 1: Quiz not generated */}
+              {!quiz && (
+                <button
+                  onClick={() => handleGenerateQuiz(week)}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition"
+                >
+                  Generate Week {week} Quiz
+                </button>
+              )}
+
+              {/* Case 2: Quiz exists but not submitted */}
+              {quiz && !quiz.submitted && (
+                <form
+                  onSubmit={(e) => handleSubmit(e, quiz)}
+                  className="space-y-6"
+                >
+                  {quiz.questions?.map((q, index) => (
+                    <div
+                      key={q.id || index}
+                      className="p-4 bg-blue-50 border border-blue-200 rounded-xl shadow-sm"
+                    >
+                      <p className="font-medium text-gray-800">{q.question}</p>
+                      <div className="mt-3 space-y-2">
+                        {q.options.map((opt, optIndex) => {
+                          const optionLetter = String.fromCharCode(
+                            65 + optIndex
+                          );
+                          return (
+                            <label
+                              key={optIndex}
+                              className="flex items-center space-x-2 cursor-pointer"
+                            >
+                              <input
+                                type="radio"
+                                name={`week-${week}-question-${index}`}
+                                value={optionLetter}
+                                checked={
+                                  answers[week]?.[index] === optionLetter
+                                }
+                                onChange={() =>
+                                  handleOptionChange(week, index, optIndex)
+                                }
+                                className="text-blue-600 focus:ring-blue-500"
+                              />
+                              <span>{`${optionLetter}: ${opt}`}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+
+                  {answers[week] &&
+                    Object.keys(answers[week]).length ===
+                      quiz.questions.length && (
+                      <button
+                        type="submit"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition"
                       >
-                        <input
-                          type="radio"
-                          name={`question-${index}`}
-                          value={optionLetter}
-                          checked={answers[index] === optionLetter}
-                          onChange={() =>
-                            handleOptionChange(index, optIndex)
-                          }
-                          className="text-blue-600 focus:ring-blue-500"
-                        />
-                        <span>{opt}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+                        Submit Quiz
+                      </button>
+                    )}
+                </form>
+              )}
 
-            {/* Render submit button only if all questions answered */}
-            {allAnswered && (
-              <button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition"
-              >
-                Submit Quiz
-              </button>
-            )}
-          </form>
-        </div>
+              {/* Case 3: Quiz submitted */}
+              {quiz && quiz.submitted && (
+                <div>
+                  <p className="text-lg font-semibold text-gray-700 mb-4">
+                    ✅ You scored {quiz.score} / {quiz.questions.length * 10}
+                  </p>
+                  <div className="space-y-4">
+                    {quiz.questions.map((q, index) => {
+                      const correct = q.answer; // backend gives `answer`
+                      const userAnswer = quiz.answers?.[index];
+                      return (
+                        <div
+                          key={index}
+                          className="p-4 border rounded-xl bg-gray-50"
+                        >
+                          <p className="font-medium">{q.question}</p>
+                          <p
+                            className={`mt-2 ${
+                              userAnswer === correct
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
+                            Your Answer: {userAnswer || "Not answered"}
+                          </p>
+                          {userAnswer !== correct && (
+                            <p className="text-green-600">
+                              Correct Answer: {correct}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </main>
     </div>
   );
