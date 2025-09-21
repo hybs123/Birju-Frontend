@@ -180,7 +180,7 @@ export default function RoadmapPage() {
       </h1>
 
       {/* Typing Intro */}
-      <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-md p-6 max-w-3xl w-full mb-8">
+      <div className="bg-white/70 text-gray-800 backdrop-blur-md rounded-2xl shadow-md p-6 max-w-3xl w-full mb-8">
         {`This is your personalized roadmap for becoming a ${roadmap.role}. It is designed for a ${roadmap.level} level and spans ${roadmap.duration} weeks.`}
       </div>
 

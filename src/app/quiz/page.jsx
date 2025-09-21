@@ -202,7 +202,7 @@ export default function QuizPage() {
                                 className="text-blue-600 focus:ring-blue-500"
                               />
                               {/* ✅ Consistent option formatting */}
-                              <span>
+                              <span className="text-gray-800">
                                 {formatOptionText(opt, optionLetter)}
                               </span>
                             </label>
