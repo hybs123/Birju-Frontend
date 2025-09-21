@@ -46,9 +46,11 @@ export default function AuthModal({ isOpen, onClose, isSignup, toggleMode }) {
         // Login → save token
         if (data.token) {
           localStorage.setItem("token", data.token);
-          if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
-          else {
-            const parseJwt = (token) => JSON.parse(atob(token.split('.')[1]));
+          if (data.user) {
+            localStorage.setItem("user", JSON.stringify(data.user));
+          } else {
+            const parseJwt = (token) =>
+              JSON.parse(atob(token.split(".")[1]));
             localStorage.setItem("user", JSON.stringify(parseJwt(data.token)));
           }
         }
@@ -61,7 +63,6 @@ export default function AuthModal({ isOpen, onClose, isSignup, toggleMode }) {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
@@ -82,14 +83,16 @@ export default function AuthModal({ isOpen, onClose, isSignup, toggleMode }) {
         {/* Form */}
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-gray-700 text-sm mb-1">Username</label>
+            <label className="block text-gray-700 text-sm mb-1">
+              Username
+            </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter your username"
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 placeholder:text-gray-500" // <-- ADDED CLASSES HERE
             />
           </div>
 
@@ -102,20 +105,22 @@ export default function AuthModal({ isOpen, onClose, isSignup, toggleMode }) {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 placeholder:text-gray-500" // <-- ADDED CLASSES HERE
               />
             </div>
           )}
 
           <div>
-            <label className="block text-gray-700 text-sm mb-1">Password</label>
+            <label className="block text-gray-700 text-sm mb-1">
+              Password
+            </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 placeholder:text-gray-500" // <-- ADDED CLASSES HERE
             />
           </div>
 

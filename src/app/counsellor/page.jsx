@@ -47,14 +47,17 @@ export default function CounsellorPage() {
     };
 
     try {
-      const res = await fetch("https://birjuram-ai.onrender.com/career/counsel", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        "https://birjuram-ai.onrender.com/career/counsel",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (res.ok) {
         const data = await res.json();
@@ -73,7 +76,9 @@ export default function CounsellorPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-100">
         <p className="text-lg text-gray-600 animate-pulse">
-          {submitting ? "Generating your counselling report..." : "Loading your counselling report..."}
+          {submitting
+            ? "Generating your counselling report..."
+            : "Loading your counselling report..."}
         </p>
       </div>
     );
@@ -103,13 +108,32 @@ export default function CounsellorPage() {
               Profile Analysis
             </h3>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li><strong>Education:</strong> {report.profile_analysis.education}</li>
-              <li><strong>Domain:</strong> {report.profile_analysis.interest_domain}</li>
-              <li><strong>Skills:</strong> {report.profile_analysis.current_skills.join(", ")}</li>
-              <li><strong>Goal:</strong> {report.profile_analysis.stated_goal}</li>
-              <li><strong>Strengths:</strong> {report.profile_analysis.key_strengths.join(", ")}</li>
-              <li><strong>Challenges:</strong> {report.profile_analysis.inferred_challenges}</li>
-              <li><strong>Market Alignment:</strong> {report.profile_analysis.market_alignment}</li>
+              <li>
+                <strong>Education:</strong> {report.profile_analysis.education}
+              </li>
+              <li>
+                <strong>Domain:</strong>{" "}
+                {report.profile_analysis.interest_domain}
+              </li>
+              <li>
+                <strong>Skills:</strong>{" "}
+                {report.profile_analysis.current_skills.join(", ")}
+              </li>
+              <li>
+                <strong>Goal:</strong> {report.profile_analysis.stated_goal}
+              </li>
+              <li>
+                <strong>Strengths:</strong>{" "}
+                {report.profile_analysis.key_strengths.join(", ")}
+              </li>
+              <li>
+                <strong>Challenges:</strong>{" "}
+                {report.profile_analysis.inferred_challenges}
+              </li>
+              <li>
+                <strong>Market Alignment:</strong>{" "}
+                {report.profile_analysis.market_alignment}
+              </li>
             </ul>
           </section>
 
@@ -118,9 +142,18 @@ export default function CounsellorPage() {
             <h3 className="text-xl font-semibold text-blue-700 mb-2">
               Strategic Guidance
             </h3>
-            <p><strong>Overview:</strong> {report.strategic_guidance.situational_overview}</p>
-            <p><strong>Clarity Strategy:</strong> {report.strategic_guidance.clarity_strategy}</p>
-            <p><strong>Recommendation:</strong> {report.strategic_guidance.overarching_recommendation}</p>
+            <p>
+              <strong>Overview:</strong>{" "}
+              {report.strategic_guidance.situational_overview}
+            </p>
+            <p>
+              <strong>Clarity Strategy:</strong>{" "}
+              {report.strategic_guidance.clarity_strategy}
+            </p>
+            <p>
+              <strong>Recommendation:</strong>{" "}
+              {report.strategic_guidance.overarching_recommendation}
+            </p>
           </section>
 
           {/* Detailed Career Pathways */}
@@ -134,31 +167,49 @@ export default function CounsellorPage() {
                   key={idx}
                   className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
                 >
-                  <h4 className="text-lg font-bold text-gray-800">{path.role}</h4>
-                  <p className="text-gray-600">{path.role_overview.description}</p>
+                  <h4 className="text-lg font-bold text-gray-800">
+                    {path.role}
+                  </h4>
+                  <p className="text-gray-600">
+                    {path.role_overview.description}
+                  </p>
 
-                  <h5 className="mt-2 font-medium text-gray-700">Day in the Life</h5>
-                  <p className="text-gray-600">{path.role_overview.day_in_the_life}</p>
+                  <h5 className="mt-2 font-medium text-gray-700">
+                    Day in the Life
+                  </h5>
+                  <p className="text-gray-600">
+                    {path.role_overview.day_in_the_life}
+                  </p>
 
-                  <h5 className="mt-2 font-medium text-gray-700">Responsibilities</h5>
+                  <h5 className="mt-2 font-medium text-gray-700">
+                    Responsibilities
+                  </h5>
                   <ul className="list-disc list-inside text-gray-600">
                     {path.role_overview.key_responsibilities.map((res, i) => (
                       <li key={i}>{res}</li>
                     ))}
                   </ul>
 
-                  <h5 className="mt-2 font-medium text-gray-700">Reality Check</h5>
+                  <h5 className="mt-2 font-medium text-gray-700">
+                    Reality Check
+                  </h5>
                   <p className="text-gray-600">{path.reality_check}</p>
 
-                  <h5 className="mt-2 font-medium text-gray-700">Learning Resources</h5>
+                  <h5 className="mt-2 font-medium text-gray-700">
+                    Learning Resources
+                  </h5>
                   <ul className="list-disc list-inside text-blue-600">
                     {path.recommended_learning_resources.map((res, i) => (
                       <li key={i}>{res}</li>
                     ))}
                   </ul>
 
-                  <h5 className="mt-2 font-medium text-gray-700">Networking Tip</h5>
-                  <p className="text-gray-600">{path.networking_and_branding_tip}</p>
+                  <h5 className="mt-2 font-medium text-gray-700">
+                    Networking Tip
+                  </h5>
+                  <p className="text-gray-600">
+                    {path.networking_and_branding_tip}
+                  </p>
                 </div>
               ))}
             </div>
@@ -170,9 +221,11 @@ export default function CounsellorPage() {
               Conclusion
             </h3>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
-              {report.concluding_summary.immediate_actions.map((action, idx) => (
-                <li key={idx}>{action}</li>
-              ))}
+              {report.concluding_summary.immediate_actions.map(
+                (action, idx) => (
+                  <li key={idx}>{action}</li>
+                )
+              )}
             </ul>
             <p className="mt-2 text-gray-600 italic">
               {report.concluding_summary.final_encouragement}
@@ -192,7 +245,7 @@ export default function CounsellorPage() {
             <input
               name="education"
               placeholder="e.g., B.Tech in Computer Science"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 placeholder:text-gray-500"
             />
           </div>
 
@@ -203,7 +256,7 @@ export default function CounsellorPage() {
             <input
               name="field"
               placeholder="e.g., Software Development"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 placeholder:text-gray-500"
             />
           </div>
 
@@ -214,7 +267,7 @@ export default function CounsellorPage() {
             <textarea
               name="skills"
               placeholder="e.g., Python, React, SQL"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none h-24"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none h-24 text-gray-900 placeholder:text-gray-500"
             />
           </div>
 
@@ -225,7 +278,7 @@ export default function CounsellorPage() {
             <textarea
               name="intent"
               placeholder="e.g., Want to explore a stable career field despite layoffs"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none h-24"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none h-24 text-gray-900 placeholder:text-gray-500"
             />
           </div>
 
