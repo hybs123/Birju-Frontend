@@ -1,103 +1,219 @@
+"use client";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import AuthModal from "./components/AuthModal";
+import ProfileDropdown from "./components/ProfileDropdown";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSignup, setIsSignup] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [hasRoadmap, setHasRoadmap] = useState(false);
+  const [hasCounselling, setHasCounselling] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+  // 🔹 Check localStorage for token & user on mount
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+    if (token && storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setIsAuthenticated(true);
+      setUser(parsedUser);
+
+      // Fetch roadmap + counselling info for the user
+      fetchUserRoadmap(parsedUser.username);
+      fetchUserCounselling(parsedUser.username);
+    }
+  }, []);
+
+  // 🔹 Fetch user's roadmap
+  const fetchUserRoadmap = async (username) => {
+    try {
+      const res = await fetch("https://birjuram-ai.onrender.com/roadmap", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
+      });
+      const data = await res.json();
+      console.log("Roadmap API response:", data);
+
+      setHasRoadmap(!!data.roadmap); // true if roadmap exists
+    } catch (err) {
+      console.error("Error fetching roadmap:", err);
+    }
+  };
+
+  // 🔹 Fetch user's counselling
+  const fetchUserCounselling = async (username) => {
+    try {
+      const res = await fetch("https://birjuram-ai.onrender.com/career", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
+      });
+      const data = await res.json();
+      console.log("Counselling API response:", data);
+
+      setHasCounselling(!!data.counseling_report); // true if counselling exists
+    } catch (err) {
+      console.error("Error fetching counselling:", err);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setIsAuthenticated(false);
+    setUser(null);
+    setHasRoadmap(false);
+    setHasCounselling(false);
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+      {/* Navbar */}
+      <nav className="w-full flex justify-between items-center px-8 py-6 z-50">
+        <Link href="/" className="text-2xl font-extrabold text-blue-600">
+          Birjuram.Ai
+        </Link>
+
+        {isAuthenticated && user ? (
+          <ProfileDropdown user={user} onLogout={handleLogout} />
+        ) : (
+          <div className="space-x-4">
+            <button
+              onClick={() => {
+                setIsSignup(false);
+                setIsOpen(true);
+              }}
+              className="text-gray-700 hover:text-blue-600 transition font-medium"
+            >
+              Login
+            </button>
+            <button
+              onClick={() => {
+                setIsSignup(true);
+                setIsOpen(true);
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-medium transition"
+            >
+              Sign Up
+            </button>
+          </div>
+        )}
+      </nav>
+
+      {/* Hero Section */}
+      <header className="flex flex-col items-center justify-center text-center px-6 mt-12">
+        <h1 className="text-5xl font-extrabold text-gray-900 leading-tight mt-20 mb-4">
+          Welcome to <span className="text-blue-600">Birjuram.Ai</span>
+        </h1>
+        <p className="text-lg text-gray-600 max-w-2xl mb-8">
+          Your AI-powered career companion — get personalized guidance,
+          generate roadmaps, and stay consistent with streaks.
+        </p>
+        <button
+          onClick={() => {
+            setIsSignup(true);
+            setIsOpen(true);
+          }}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition"
+        >
+          Get Started
+        </button>
+      </header>
+
+      {/* Features Section */}
+      <main className="flex flex-col items-center justify-center flex-1 px-6 mt-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+          {/* Career Counsellor */}
+          <div className="p-8 bg-white/70 backdrop-blur-md rounded-2xl shadow-md hover:shadow-lg transition flex flex-col items-center">
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src="/icons/counsellor.png"
+              alt="Career Counsellor"
+              width={150}
+              height={150}
+              className="mb-4"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <h3 className="text-xl font-semibold text-gray-800 text-center">
+              Career Counsellor
+            </h3>
+            <p className="text-gray-600 mt-2 text-center">
+              Get personalized advice on choosing and growing in your career.
+            </p>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition mt-auto">
+              {hasCounselling ? "View Counselling" : "Get Started"}
+            </button>
+          </div>
+
+          {/* Roadmap */}
+          <div className="p-8 bg-white/70 backdrop-blur-md rounded-2xl shadow-md hover:shadow-lg transition flex flex-col items-center">
+            <Image
+              src="/icons/roadmap.png"
+              alt="Generate Roadmap"
+              width={150}
+              height={150}
+              className="mb-4"
+            />
+            <h3 className="text-xl font-semibold text-gray-800">
+              Generate Roadmap
+            </h3>
+            <p className="text-gray-600 mt-2 text-center">
+              AI-generated step-by-step roadmap tailored to your goals.
+            </p>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition mt-auto">
+              {hasRoadmap ? "View Roadmap" : "Get Started"}
+            </button>
+          </div>
+
+          {/* Streak */}
+          <div className="p-8 bg-white/70 backdrop-blur-md rounded-2xl shadow-md hover:shadow-lg transition flex flex-col items-center">
+            <Image
+              src="/icons/streak.png"
+              alt="Streak"
+              width={150}
+              height={150}
+              className="mb-4"
+            />
+            <h3 className="text-xl font-semibold text-gray-800">Streak</h3>
+            <p className="text-gray-600 mt-2 text-center">
+              Stay motivated by tracking your daily progress and streaks.
+            </p>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition mt-auto">
+              Get Started
+            </button>
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Footer */}
+      <footer className="w-full text-center py-6 text-gray-600 mt-12">
+        © {new Date().getFullYear()} Birjuram.Ai — All rights reserved.
       </footer>
+
+      <AuthModal
+        isOpen={isOpen}
+        onClose={() => {
+          setIsOpen(false);
+          const token = localStorage.getItem("token");
+          const storedUser = localStorage.getItem("user");
+          if (token && storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            setIsAuthenticated(true);
+            setUser(parsedUser);
+
+            // Refresh roadmap + counselling status after login
+            fetchUserRoadmap(parsedUser.username);
+            fetchUserCounselling(parsedUser.username);
+          }
+        }}
+        isSignup={isSignup}
+        toggleMode={() => setIsSignup(!isSignup)}
+      />
     </div>
   );
 }
