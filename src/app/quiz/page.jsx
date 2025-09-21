@@ -49,8 +49,14 @@ export default function QuizPage() {
     }));
   };
 
+  // Normalize option text (remove duplicate "A:" etc.)
+  const formatOptionText = (opt, letter) => {
+    // remove leading "A:", "B:", etc. if backend already provided
+    const cleaned = opt.replace(/^[A-D]:\s*/, "").trim();
+    return `${letter}) ${cleaned}`;
+  };
+
   // Submit quiz
-  //Submit quiz 2
   const handleSubmit = async (e, quiz) => {
     e.preventDefault();
     if (!quiz) return;
@@ -195,7 +201,10 @@ export default function QuizPage() {
                                 }
                                 className="text-blue-600 focus:ring-blue-500"
                               />
-                              <span>{`${optionLetter}: ${opt}`}</span>
+                              {/* ✅ Consistent option formatting */}
+                              <span>
+                                {formatOptionText(opt, optionLetter)}
+                              </span>
                             </label>
                           );
                         })}
@@ -224,7 +233,7 @@ export default function QuizPage() {
                   </p>
                   <div className="space-y-4">
                     {quiz.questions.map((q, index) => {
-                      const correct = q.answer; // backend gives `answer`
+                      const correct = q.answer; // backend gives `answer` (like "C")
                       const userAnswer = quiz.answers?.[index];
                       return (
                         <div
