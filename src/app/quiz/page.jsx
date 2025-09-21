@@ -50,6 +50,7 @@ export default function QuizPage() {
   };
 
   // Submit quiz
+  //Submit quiz 2
   const handleSubmit = async (e, quiz) => {
     e.preventDefault();
     if (!quiz) return;
